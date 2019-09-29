@@ -1,9 +1,0 @@
-server:
-  port: 8085
-cloud:
-  aws:
-    region:
-      static: ap-northeast-1
-    credentials:
-      accessKey:
-      secretKey:

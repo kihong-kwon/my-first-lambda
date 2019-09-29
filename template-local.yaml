@@ -2,16 +2,22 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Spring Cloud Functions.
 Resources:
-  AwsLambdaTestLocal:
+  AwsLambdaFunctionLocal:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: aws-lambda-sqs
-      Handler: net.kkhstudy.myfirstlambda.TestHandler
+      Handler: net.kkhstudy.myfirstlambda.AwsLambdaFunctionHandler
       Description: For AWS Lambda Test
       Runtime: java8
-      CodeUri: .\target\my-first-lambda-0.0.1-SNAPSHOT-aws.jar
+      CodeUri: .
       MemorySize: 320
       Timeout: 120
       Environment:
         Variables:
           SPRING_PROFILES_ACTIVE: local
+      Events:
+        AwsLambdaFunction:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /awsLambdaFunction
+            Method: get

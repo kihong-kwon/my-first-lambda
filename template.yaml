@@ -11,33 +11,19 @@ Globals:
     Timeout: 20
 
 Resources:
-  MyFirstLambdaFunction:
+  AwsLambdaFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: MyFirstLambdaFunction
-      Handler: net.kkhstudy.myfirstlambda.TestHandler
+      CodeUri: ./target/my-first-lambda-0.0.1-SNAPSHOT-aws.jar
+      Handler: net.kkhstudy.myfirstlambda.AwsLambdaFunctionHandler
       Runtime: java8
       MemorySize: 512
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           SPRING_PROFILES_ACTIVE: aws
       Events:
-        UpperCaser:
+        AwsLambdaFunction:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /uppercaser
+            Path: /awsLambdaFunction
             Method: get
-
-Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  MyFirstLambdaApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/uppercaser/"
-  MyFirstLambdaFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt MyFirstLambdaFunction.Arn
-  MyFirstLambdaFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt MyFirstLambdaFunctionIamRole.Arn
