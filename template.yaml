@@ -1,29 +1,61 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  AWS
-
-  Sample SAM Template for AWS
-
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
+    Runtime: java8
     Timeout: 20
-
+    MemorySize: 320
+    Handler: net.kkhstudy.myfirstlambda.handler.DemoFunctionHandlerRest
+    Environment:
+      Variables:
+        TABLE_NAME: DemoEntity
+        MAIN_CLASS: net.kkhstudy.myfirstlambda.MyFirstLambdaApplication
+  Api:
+    EndpointConfiguration: REGIONAL
 Resources:
-  AwsLambdaFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  DemoEntityTable:
+    Type: AWS::Serverless::SimpleTable
     Properties:
+      PrimaryKey:
+        Name: name
+        Type: String
+      TableName: DemoEntity
+  CreateEntityFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      #Runtime: java8
+      #Handler: de.margul.awstutorials.DemoFunctionHandler::handleRequest
+      #Timeout: 60
+      Description: Creates new demo entities
       CodeUri: ./target/my-first-lambda-0.0.1-SNAPSHOT-aws.jar
-      Handler: net.kkhstudy.myfirstlambda.AwsLambdaFunctionHandler
-      Runtime: java8
-      MemorySize: 512
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DemoEntityTable
+      Environment:
         Variables:
+          FUNCTION_NAME: createEntityFunction
           SPRING_PROFILES_ACTIVE: aws
       Events:
-        AwsLambdaFunction:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        CreateEntityApi:
+          Type: Api
           Properties:
-            Path: /awsLambdaFunction
-            Method: get
+            Path: /entities
+            Method: POST
+  GetEntityFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Description: Fetch a demo entity by its name
+      Environment:
+        Variables:
+          FUNCTION_NAME: getEntityFunction
+          SPRING_PROFILES_ACTIVE: aws
+      CodeUri: ./target/my-first-lambda-0.0.1-SNAPSHOT-aws.jar
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref DemoEntityTable
+      Events:
+        GetEntityApi:
+          Type: Api
+          Properties:
+            Path: /entities/{name}
+            Method: GET

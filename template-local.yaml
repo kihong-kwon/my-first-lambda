@@ -1,23 +1,47 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Spring Cloud Functions.
+Globals:
+  Function:
+    Runtime: java8
+    Timeout: 20
+    MemorySize: 320
+    Handler: net.kkhstudy.myfirstlambda.handler.DemoFunctionHandlerRest
+    Environment:
+      Variables:
+        TABLE_NAME: DemoEntity
+        MAIN_CLASS: net.kkhstudy.myfirstlambda.MyFirstLambdaApplication
 Resources:
-  AwsLambdaFunctionLocal:
-    Type: AWS::Serverless::Function
+  CreateEntityFunction:
+    Type: 'AWS::Serverless::Function'
     Properties:
-      FunctionName: aws-lambda-sqs
-      Handler: net.kkhstudy.myfirstlambda.AwsLambdaFunctionHandler
-      Description: For AWS Lambda Test
-      Runtime: java8
+      #Runtime: java8
+      #Handler: de.margul.awstutorials.DemoFunctionHandler::handleRequest
+      #Timeout: 60
+      Description: Creates new demo entities
       CodeUri: .
-      MemorySize: 320
-      Timeout: 120
       Environment:
         Variables:
+          FUNCTION_NAME: createEntityFunction
           SPRING_PROFILES_ACTIVE: local
       Events:
-        AwsLambdaFunction:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        CreateEntityApi:
+          Type: Api
           Properties:
-            Path: /awsLambdaFunction
-            Method: get
+            Path: /entities
+            Method: POST
+  GetEntityFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Description: Fetch a demo entity by its name
+      Environment:
+        Variables:
+          FUNCTION_NAME: getEntityFunction
+          SPRING_PROFILES_ACTIVE: local
+      CodeUri: .
+      Events:
+        GetEntityApi:
+          Type: Api
+          Properties:
+            Path: /entities/{name}
+            Method: GET

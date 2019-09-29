@@ -24,13 +24,37 @@
         <aws.sdk.version>1.11.226</aws.sdk.version>
         <spring-cloud-function.version>2.0.1.RELEASE</spring-cloud-function.version>
         <start-class>net.kkhstudy.myfirstlambda.MyFirstLambdaApplication</start-class>
+
+        <awsRegion>ap-northeast-1</awsRegion>
+        <s3Bucket>myfirstlambda.kkh-study</s3Bucket>
+        <stackName>MyFirstLambdaStack</stackName>
+        <s3Prefix>my-first-lambda/${project.groupId}:${project.artifactId}:${project.version}</s3Prefix>
+        <skipLocalInvoke>true</skipLocalInvoke>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
+        <!--Spring-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-function-web</artifactId>
+            <version>${spring-cloud-function.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-function-adapter-aws</artifactId>
             <version>${spring-cloud-function.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-function-context</artifactId>
+            <version>2.0.1.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.derjust</groupId>
+            <artifactId>spring-data-dynamodb</artifactId>
+            <version>5.1.0</version>
         </dependency>
 
         <!--AWS SDK-->
@@ -53,17 +77,15 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--Logging-->
-
+        <!--Etc..-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <!--test-->
@@ -88,6 +110,13 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -123,17 +152,99 @@
                         <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                             <resource>META-INF/spring.handlers</resource>
                         </transformer>
-                        <transformer
-                                implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
+                        <transformer implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
                             <resource>META-INF/spring.factories</resource>
                         </transformer>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                             <resource>META-INF/spring.schemas</resource>
                         </transformer>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <manifestEntries>
+                                <Main-Class>net.kkhstudy.myfirstlambda.MyFirstLambdaApplication</Main-Class>
+                            </manifestEntries>
+                        </transformer>
                     </transformers>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>shade</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <id>sam-local-invoke</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>sam</executable>
+                            <arguments>
+                                <argument>local</argument>
+                                <argument>invoke</argument>
+                                <argument>-e</argument>
+                                <argument>event.json</argument>
+                            </arguments>
+                            <skip>${skipLocalInvoke}</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>sam-package</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>aws</executable>
+                            <arguments>
+                                <argument>cloudformation</argument>
+                                <argument>package</argument>
+                                <argument>--region=${awsRegion}</argument>
+                                <argument>--template-file=template.yaml</argument>
+                                <argument>--output-template-file=target/sam.yaml</argument>
+                                <argument>--s3-bucket=${s3Bucket}</argument>
+                                <argument>--s3-prefix=${s3Prefix}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>sam-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>aws</executable>
+                            <arguments>
+                                <argument>cloudformation</argument>
+                                <argument>deploy</argument>
+                                <argument>--region=${awsRegion}</argument>
+                                <argument>--template-file=target/sam.yaml</argument>
+                                <argument>--stack-name=${stackName}</argument>
+                                <argument>--capabilities=CAPABILITY_IAM</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>invoke</id>
+            <properties>
+                <skipLocalInvoke>false</skipLocalInvoke>
+            </properties>
+        </profile>
+    </profiles>
 </project>
