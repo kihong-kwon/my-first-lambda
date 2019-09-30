@@ -5,19 +5,20 @@ import net.kkhstudy.myfirstlambda.entity.DynamoDemoEntity;
 import net.kkhstudy.myfirstlambda.repositories.IDemoEntityDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Component
-public class CreateEntityFunction implements Consumer<Message<DemoRequest>> {
+public class CreateEntityFunction implements Function<Message<DemoRequest>, Message<String>> {
 
     @Autowired
     private IDemoEntityDao dao;
 
     @Override
-    public void accept(Message<DemoRequest> m) {
+    public Message<String> apply(Message<DemoRequest> m) {
+        System.out.println("Start CreateEntityFunction!!!!");
         DemoRequest demo = m.getPayload();
         DynamoDemoEntity entity = new DynamoDemoEntity();
         entity.setName(demo.getName());
@@ -25,5 +26,8 @@ public class CreateEntityFunction implements Consumer<Message<DemoRequest>> {
         dao.createEntity(entity);
         System.out.println("Created entity with name "
                 + entity.getName());
+        Message<String> message = MessageBuilder.withPayload("insert success!")
+                .setHeader("contentType", "application/json").build();
+        return message;
     }
 }

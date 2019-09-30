@@ -11,14 +11,13 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import net.kkhstudy.myfirstlambda.entity.IDemoEntity;
 import net.kkhstudy.myfirstlambda.repositories.DynamoDemoEntityDeserializer;
-import net.kkhstudy.myfirstlambda.repositories.DynamoDemoEntityRepository;
 import org.socialsignin.spring.data.dynamodb.repository.config.EnableDynamoDBRepositories;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableDynamoDBRepositories(basePackageClasses = DynamoDemoEntityRepository.class)
+@EnableDynamoDBRepositories(basePackages = "net.kkhstudy.myfirstlambda")
 public class DynamoDBConfig {
 
     @Value("${cloud.aws.credentials.accessKey}")
@@ -37,8 +36,10 @@ public class DynamoDBConfig {
 
     @Bean
     public AmazonDynamoDB amazonDynamoDB() {
-        return AmazonDynamoDBClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
-                .withRegion(amazonAwsRegion).build();
+        //return AmazonDynamoDBClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
+        //        .withRegion(amazonAwsRegion).build();
+        return AmazonDynamoDBClientBuilder.standard().withRegion(amazonAwsRegion).build();
+
     }
 
     /*

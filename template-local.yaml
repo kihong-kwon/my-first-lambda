@@ -28,20 +28,20 @@ Resources:
         CreateEntityApi:
           Type: Api
           Properties:
-            Path: /entities
+            Path: /updateEntitie
             Method: POST
-  GetEntityFunction:
-    Type: 'AWS::Serverless::Function'
-    Properties:
-      Description: Fetch a demo entity by its name
-      Environment:
-        Variables:
-          FUNCTION_NAME: getEntityFunction
-          SPRING_PROFILES_ACTIVE: local
-      CodeUri: .
-      Events:
-        GetEntityApi:
-          Type: Api
-          Properties:
-            Path: /entities/{name}
-            Method: GET
+    GetEntityFunction:
+      Type: 'AWS::Serverless::Function'
+      Properties:
+        Description: Fetch a demo entity by its name
+        Environment:
+          Variables:
+            FUNCTION_NAME: getEntityFunction
+            SPRING_PROFILES_ACTIVE: local
+        CodeUri: .
+        Events:
+          GetEntityApi:
+            Type: Api
+            Properties:
+              Path: /getEntitie
+              Method: POST

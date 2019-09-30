@@ -3,8 +3,8 @@ Transform: AWS::Serverless-2016-10-31
 Globals:
   Function:
     Runtime: java8
-    Timeout: 20
-    MemorySize: 320
+    Timeout: 60
+    MemorySize: 1024
     Handler: net.kkhstudy.myfirstlambda.handler.DemoFunctionHandlerRest
     Environment:
       Variables:
@@ -39,7 +39,7 @@ Resources:
         CreateEntityApi:
           Type: Api
           Properties:
-            Path: /entities
+            Path: /updateEntitie
             Method: POST
   GetEntityFunction:
     Type: 'AWS::Serverless::Function'
@@ -57,5 +57,5 @@ Resources:
         GetEntityApi:
           Type: Api
           Properties:
-            Path: /entities/{name}
-            Method: GET
+            Path: /getEntitie
+            Method: POST

@@ -1,9 +1,9 @@
 package net.kkhstudy.myfirstlambda.repositories;
 
 import net.kkhstudy.myfirstlambda.entity.DynamoDemoEntity;
+import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+@EnableScan
 public interface DynamoDemoEntityRepository extends CrudRepository<DynamoDemoEntity, String> {
 }
