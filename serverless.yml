@@ -1,0 +1,80 @@
+service: my-first-lambda
+plugins:
+  - serverless-localstack
+provider:
+  name: aws
+  runtime: java8
+  timeout: 30
+  memorySize: 1024
+  stage: v1
+  region: ap-northeast-1
+  apiName: MyFirstLambdaStack
+  endpointType: regional
+  deploymentBucket:
+    name: myfirstlambda.kkh-study
+  logRetentionInDays : 7
+  versionFunctions :  false
+  environment:
+    TABLE_NAME: DemoEntity
+    MAIN_CLASS: net.kkhstudy.myfirstlambda.MyFirstLambdaApplication
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.TABLE_NAME}"
+
+custom:
+  localstack:
+    stages:
+      - local
+    host: http://localhost
+    endpoints:
+    lambda:
+      mountCode: False
+    debug: true # for debug
+
+package:
+  artifact: target/my-first-lambda-0.0.1-SNAPSHOT-aws.jar
+
+functions:
+  CreateEntityFunction:
+    handler: net.kkhstudy.myfirstlambda.handler.DemoFunctionHandlerRest
+    description: Creates new demo entities
+    environment:
+      FUNCTION_NAME: createEntityFunction
+      SPRING_PROFILES_ACTIVE: aws
+    events:
+      - http:
+          path: updateEntitie
+          method: post
+  GetEntityFunction:
+    handler: net.kkhstudy.myfirstlambda.handler.DemoFunctionHandlerRest
+    description: get new demo entities
+    environment:
+      FUNCTION_NAME: getEntityFunction
+      SPRING_PROFILES_ACTIVE: aws
+    events:
+      - http:
+          path: getEntitie
+          method: post
+
+resources:
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: DemoEntity
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
