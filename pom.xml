@@ -31,13 +31,23 @@
         <s3Prefix>my-first-lambda/${project.groupId}:${project.artifactId}:${project.version}</s3Prefix>
         <skipLocalInvoke>true</skipLocalInvoke>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <junit-jupiter.version>5.3.2</junit-jupiter.version>
+        <mockito.version>2.24.0</mockito.version>
     </properties>
 
     <dependencies>
-        <!--Spring-->
+        <!--Spring -->
+        <!--Need to delete -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-function-web</artifactId>
+            <version>${spring-cloud-function.version}</version>
+        </dependency>
+        <!--Need to delete -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-function-web</artifactId>
             <version>${spring-cloud-function.version}</version>
         </dependency>
         <dependency>
@@ -62,6 +72,11 @@
             <artifactId>aws-lambda-java-log4j</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sqs</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
 
         <!--Etc..-->
         <dependency>
@@ -79,10 +94,41 @@
             <optional>true</optional>
         </dependency>
 
-        <!--test-->
+        <!-- TEST -->
+        <!-- exclude junit 4 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- junit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>1.11.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>localstack</artifactId>
+            <version>1.11.1</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.localstack</groupId>
+            <artifactId>localstack-utils</artifactId>
+            <version>0.1.19</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

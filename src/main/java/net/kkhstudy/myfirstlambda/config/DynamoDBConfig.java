@@ -15,7 +15,9 @@ import org.socialsignin.spring.data.dynamodb.repository.config.EnableDynamoDBRep
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
+@Profile("!local")
 @Configuration
 @EnableDynamoDBRepositories(basePackages = "net.kkhstudy.myfirstlambda")
 public class DynamoDBConfig {
@@ -36,10 +38,7 @@ public class DynamoDBConfig {
 
     @Bean
     public AmazonDynamoDB amazonDynamoDB() {
-        //return AmazonDynamoDBClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
-        //        .withRegion(amazonAwsRegion).build();
         return AmazonDynamoDBClientBuilder.standard().withRegion(amazonAwsRegion).build();
-
     }
 
     /*
@@ -48,14 +47,14 @@ public class DynamoDBConfig {
         return new DynamoDBMapper(amazonDynamoDB, dynamoDBMapperConfig);
     }*/
 
-    private AWSCredentialsProvider amazonAWSCredentialsProvider() {
+    /*private AWSCredentialsProvider amazonAWSCredentialsProvider() {
         return new AWSStaticCredentialsProvider(amazonAWSCredentials());
-    }
+    }*/
 
-    @Bean
+    /*@Bean
     public AWSCredentials amazonAWSCredentials() {
         return new BasicAWSCredentials(amazonAWSAccessKey, amazonAWSSecretKey);
-    }
+    }*/
 
     @Bean
     public Module dynamoDemoEntityDeserializer() {
