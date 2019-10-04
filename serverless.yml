@@ -17,6 +17,8 @@ provider:
   environment:
     TABLE_NAME: DemoEntity
     MAIN_CLASS: net.kkhstudy.myfirstlambda.MyFirstLambdaApplication
+    SOURCE_BUCKET: image-source.kkh-study
+    RESIZED_BUCKET: image-resized.kkh-study
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -27,6 +29,14 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.TABLE_NAME}"
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "arn:aws:s3:::${self:provider.environment.RESIZED_BUCKET}/*"
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "arn:aws:s3:::${self:provider.environment.SOURCE_BUCKET}/*"
 
 custom:
   localstack:
@@ -62,7 +72,18 @@ functions:
       - http:
           path: getEntitie
           method: post
-
+  ResizeImage:
+    handler: net.kkhstudy.myfirstlambda.handler.S3EventHandler
+    description: get new demo entities
+    environment:
+      FUNCTION_NAME: s3DrivenFunction
+      SPRING_PROFILES_ACTIVE: aws
+    events:
+      - s3:
+          bucket: ${self:provider.environment.SOURCE_BUCKET}
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .jpg
 resources:
   Resources:
     usersTable:
@@ -78,3 +99,8 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    ImageResizeSource:
+      Type: AWS::S3::Bucket # creating an S3 Bucket
+      Properties:
+        AccessControl: private
+        BucketName: ${self:provider.environment.RESIZED_BUCKET}

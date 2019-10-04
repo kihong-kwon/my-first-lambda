@@ -2,6 +2,7 @@ package net.kkhstudy.myfirstlambda;
 
 import net.kkhstudy.myfirstlambda.function.CreateEntityFunction;
 import net.kkhstudy.myfirstlambda.function.GetEntityFunction;
+import net.kkhstudy.myfirstlambda.function.S3DrivenFunction;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -21,5 +22,10 @@ public class MyFirstLambdaApplication {
     @Bean
     public GetEntityFunction getEntityFunction() {
         return new GetEntityFunction();
+    }
+
+    @Bean
+    public S3DrivenFunction s3DrivenFunction() {
+        return new S3DrivenFunction();
     }
 }
