@@ -1,0 +1,16 @@
+pip install localstack
+pip install "localstack==0.9.0"
+
+npm install -g serverless
+npm install --save-dev serverless-localstack
+
+serverless config credentials --provider aws --key <key>--secret <secret>
+serverless deploy --stage local
+
+aws --endpoint-url=http://localhost:4572 s3 mb s3://test-bucket
+aws --endpoint-url=http://localhost:4572 s3 cp ./target/my-first-lambda-0.0.1-SNAPSHOT-aws.jar s3://test-bucket
+aws --endpoint-url=http://localhost:4572 s3 ls test-bucket
+
+aws --endpoint-url=http://localhost:4572 s3api put-bucket-acl --bucket test-bucket --acl public-read-write
+aws --endpoint-url=http://localhost:4581 cloudformation package --region=ap-northeast-1 --template-file=template.yaml --output-template-file=sam.yaml --s3-bucket=test-bucket
+aws --endpoint-url=http://localhost:4581 cloudformation deploy --region=ap-northeast-1 --template-file=sam.yaml --stack-name=testStack --capabilities=CAPABILITY_IAM
