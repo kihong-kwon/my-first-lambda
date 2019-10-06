@@ -3,11 +3,13 @@ package net.kkhstudy.myfirstlambda.modules.localstack;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportAware;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 
+@Profile("local")
 @Configuration
 public class AwsLocalStackConfig implements ImportAware {
     private AnnotationAttributes annotationAttributes;

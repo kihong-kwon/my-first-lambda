@@ -1,0 +1,9 @@
+POST http://localhost:8085/createEntityFunction
+Content-Type: application/json
+
+{
+"name": "test",
+"description": "test"
+}
+
+###

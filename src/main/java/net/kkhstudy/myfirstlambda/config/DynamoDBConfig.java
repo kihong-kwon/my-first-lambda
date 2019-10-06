@@ -1,5 +1,6 @@
 package net.kkhstudy.myfirstlambda.config;
 
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
@@ -24,8 +25,11 @@ public class DynamoDBConfig {
     @Value("${cloud.aws.credentials.secretKey}")
     private String amazonAWSSecretKey;
 
+    @Value("${cloud.aws.dynamodb.endpoint}")
+    private String amazonAWSEndpoint;
+
     @Value("${cloud.aws.region.static}")
-    private String amazonAwsRegion;
+    private String amazonAWSRegion;
 
     @Bean
     public DynamoDBMapperConfig dynamoDBMapperConfig() {
@@ -34,7 +38,13 @@ public class DynamoDBConfig {
 
     @Bean
     public AmazonDynamoDB amazonDynamoDB() {
-        return AmazonDynamoDBClientBuilder.standard().withRegion(amazonAwsRegion).build();
+        if (amazonAWSEndpoint != null)  {
+            return AmazonDynamoDBClientBuilder.standard()
+                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(amazonAWSEndpoint, amazonAWSRegion))
+                    .build();
+        } else {
+            return AmazonDynamoDBClientBuilder.standard().withRegion(amazonAWSRegion).build();
+        }
     }
 
     /*
