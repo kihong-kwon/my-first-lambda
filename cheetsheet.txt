@@ -6,6 +6,7 @@ npm install --save-dev serverless-localstack
 
 serverless config credentials --provider aws --key <key>--secret <secret>
 serverless deploy --stage local
+serverless invoke local --stage local --function CreateEntityFunction --data ./events/event.json
 
 aws --endpoint-url=http://localhost:4572 s3 mb s3://test-bucket
 aws --endpoint-url=http://localhost:4572 s3 cp ./target/my-first-lambda-0.0.1-SNAPSHOT-aws.jar s3://test-bucket

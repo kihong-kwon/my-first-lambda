@@ -3,7 +3,7 @@ package net.kkhstudy.myfirstlambda.utils;
 import com.amazonaws.services.lambda.model.FunctionCode;
 import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.lambda.runtime.events.SQSEvent;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.commons.compress.utils.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

@@ -22,7 +22,7 @@
         <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
         <wrapper.version>1.0.21.RELEASE</wrapper.version>
         <aws.sdk.version>1.11.226</aws.sdk.version>
-        <spring-cloud-function.version>2.0.1.RELEASE</spring-cloud-function.version>
+        <spring-cloud-function.version>2.1.1.RELEASE</spring-cloud-function.version>
         <start-class>net.kkhstudy.myfirstlambda.MyFirstLambdaApplication</start-class>
 
         <awsRegion>ap-northeast-1</awsRegion>
@@ -38,22 +38,20 @@
 
     <dependencies>
         <!--Spring -->
-        <!--Need to delete -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-function-web</artifactId>
-            <version>${spring-cloud-function.version}</version>
+            <version>2.1.1.RELEASE</version>
         </dependency>
-        <!--Need to delete -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-function-web</artifactId>
-            <version>${spring-cloud-function.version}</version>
+            <artifactId>spring-cloud-function-context</artifactId>
+            <version>2.1.1.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-function-adapter-aws</artifactId>
-            <version>${spring-cloud-function.version}</version>
+            <version>2.1.1.RELEASE</version>
         </dependency>
 
         <!--AWS SDK-->
