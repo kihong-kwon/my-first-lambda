@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.util.StringUtils;
 
 @Profile("!local")
 @Configuration
@@ -38,7 +39,7 @@ public class DynamoDBConfig {
 
     @Bean
     public AmazonDynamoDB amazonDynamoDB() {
-        if (amazonAWSEndpoint != null)  {
+        if (!StringUtils.isEmpty(amazonAWSEndpoint))  {
             return AmazonDynamoDBClientBuilder.standard()
                     .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(amazonAWSEndpoint, amazonAWSRegion))
                     .build();

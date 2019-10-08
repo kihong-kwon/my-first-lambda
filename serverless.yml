@@ -102,5 +102,5 @@ resources:
     ImageResizeSource:
       Type: AWS::S3::Bucket # creating an S3 Bucket
       Properties:
-        AccessControl: private
+        AccessControl: Private
         BucketName: ${self:provider.environment.RESIZED_BUCKET}
