@@ -1,4 +1,4 @@
-POST http://localhost:8085/createEntityFunction
+POST http://localhost:4567/restapis/zeufmtjc7r/local/_user_request_/updateEntitie
 Content-Type: application/json
 
 {
