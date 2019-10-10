@@ -1,4 +1,6 @@
 package net.kkhstudy.myfirstlambda.handler;
 
-public class DemoFunctionHandlerRest extends RestSpringBootApiGatewayRequestHandler {
+import org.springframework.cloud.function.adapter.aws.SpringBootApiGatewayRequestHandler;
+
+public class DemoFunctionHandlerRest extends SpringBootApiGatewayRequestHandler {
 }

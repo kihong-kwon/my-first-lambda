@@ -84,6 +84,16 @@ functions:
           event: s3:ObjectCreated:*
           rules:
             - suffix: .jpg
+  ConsumerFunction:
+    handler: net.kkhstudy.myfirstlambda.handler.DemoFunctionHandlerRest
+    description: get new demo entities
+    environment:
+      FUNCTION_NAME: consumerFunction
+      SPRING_PROFILES_ACTIVE: aws
+    events:
+      - http:
+          path: consumerFunction
+          method: post
 resources:
   Resources:
     usersTable:

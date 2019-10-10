@@ -24,7 +24,7 @@ public class S3ClientConfig {
         if (!StringUtils.isEmpty(amazonAWSEndpoint))  {
             return AmazonS3ClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(amazonAWSEndpoint, amazonAWSRegion)).build();
         } else {
-            return AmazonS3ClientBuilder.standard().build();
+            return AmazonS3ClientBuilder.standard().withRegion(amazonAWSRegion).build();
         }
 
     }
