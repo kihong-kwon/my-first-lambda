@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.function.Function;
 
 @Component
+@Transactional
 public class CreateEntityFunction implements Function<Message<DemoRequest>, Message<String>> {
 
     @Autowired
@@ -28,6 +30,11 @@ public class CreateEntityFunction implements Function<Message<DemoRequest>, Mess
                 + entity.getName());
         Message<String> message = MessageBuilder.withPayload("insert success!")
                 .setHeader("contentType", "application/json").build();
+        System.out.println("Insert success!");
+        int i = 1;
+        if (i == 1) {
+            throw new RuntimeException("Test Error");
+        }
         return message;
     }
 }

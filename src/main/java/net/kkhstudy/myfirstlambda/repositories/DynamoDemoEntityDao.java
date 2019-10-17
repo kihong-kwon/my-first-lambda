@@ -33,4 +33,5 @@ public class DynamoDemoEntityDao implements IDemoEntityDao {
     public void deleteEntity(String name) {
         repository.deleteById(name);
     }
+
 }
