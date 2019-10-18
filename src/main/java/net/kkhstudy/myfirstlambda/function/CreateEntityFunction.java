@@ -5,6 +5,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTransactionWriteExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.TransactionWriteRequest;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.InternalServerErrorException;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
 import com.amazonaws.services.dynamodbv2.model.TransactionCanceledException;
@@ -15,6 +16,8 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Component
@@ -26,18 +29,22 @@ public class CreateEntityFunction implements Function<Message<DemoRequest>, Mess
     @Override
     public Message<String> apply(Message<DemoRequest> m) {
 
-        //dynamoDBMapper = new DynamoDBMapper(amazonDynamoDB);
         System.out.println("Start CreateEntityFunction!!!!");
         DemoRequest demo = m.getPayload();
         DynamoDemoEntity entity1 = new DynamoDemoEntity();
         entity1.setName("test1");
-        entity1.setDescription("test2");
-        //dynamoDBMapper.save(entity);
+        entity1.setDescription("test1");
+
         DynamoDemoEntity entity2 = new DynamoDemoEntity();
-        entity2.setName("test");
-        entity2.setDescription("test");
+        entity2.setName(demo.getName());
+        entity2.setDescription(demo.getDescription());
+
+        Map<String, AttributeValue> eav = new HashMap<>();
+        eav.put(":v1",new AttributeValue().withS(demo.getDescription()));
+        System.out.println(demo.getDescription());
         DynamoDBTransactionWriteExpression conditionExpressionForConditionCheck = new DynamoDBTransactionWriteExpression()
-                .withConditionExpression("attribute_exists(Name)");
+                .withConditionExpression("attribute_exists(Description)");
+                //.withExpressionAttributeValues(eav);
 
         DynamoDemoEntity entity3 = new DynamoDemoEntity();
         entity3.setName("test3");
