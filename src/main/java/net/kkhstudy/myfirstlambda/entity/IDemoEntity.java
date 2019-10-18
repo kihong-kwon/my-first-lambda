@@ -1,8 +1,8 @@
 package net.kkhstudy.myfirstlambda.entity;
 
 public interface IDemoEntity {
-    String getName();
+    String getTitle();
     String getDescription();
-    void setName(String name);
+    void setTitle(String title);
     void setDescription(String description);
 }

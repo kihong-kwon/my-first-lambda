@@ -5,18 +5,18 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 @DynamoDBTable(tableName = "DemoEntity")
 public class DynamoDemoEntity implements IDemoEntity {
-    private String name;
+    private String title;
     private String description;
 
     @Override
     @DynamoDBHashKey
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
     @Override
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     @Override

@@ -13,6 +13,6 @@ public class ConsumerFunction implements Consumer<Message<IDemoEntity>> {
 
     @Override
     public void accept(Message<IDemoEntity> m) {
-        System.out.println("Created entity with name " + m.getPayload().getName());
+        System.out.println("Created entity with name " + m.getPayload().getTitle());
     }
 }

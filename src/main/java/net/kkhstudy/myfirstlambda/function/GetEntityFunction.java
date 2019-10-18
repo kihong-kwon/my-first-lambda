@@ -16,7 +16,7 @@ public class GetEntityFunction implements Function<Message<IDemoEntity>, Message
         System.out.println("Start GetEntityFunction!!!!");
         IDemoEntity iputEntity = m.getPayload();
         Optional<IDemoEntity> response = Optional.ofNullable(iputEntity);
-        System.out.println("Name: " + response.get().getName());
+        System.out.println("Name: " + response.get().getTitle());
         Message<IDemoEntity> message = MessageBuilder.withPayload(response.get())
                 .setHeader("contentType", "application/json").build();
         return message;
