@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DemoRequest {
     private String title;
+    private String author;
     private String description;
 }

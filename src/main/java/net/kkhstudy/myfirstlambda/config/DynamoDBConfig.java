@@ -1,5 +1,9 @@
 package net.kkhstudy.myfirstlambda.config;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
@@ -36,10 +40,12 @@ public class DynamoDBConfig {
     public AmazonDynamoDB amazonDynamoDB() {
         if (!StringUtils.isEmpty(amazonAWSEndpoint))  {
             return AmazonDynamoDBClientBuilder.standard()
+                    .withCredentials(amazonAWSCredentialsProvider())
                     .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(amazonAWSEndpoint, amazonAWSRegion))
                     .build();
         } else {
-            return AmazonDynamoDBClientBuilder.standard().withRegion(amazonAWSRegion).build();
+            return AmazonDynamoDBClientBuilder.standard()
+                    .withRegion(amazonAWSRegion).build();
         }
     }
 
@@ -48,12 +54,12 @@ public class DynamoDBConfig {
         return new DynamoDBMapper(amazonDynamoDB, dynamoDBMapperConfig);
     }
 
-    /*private AWSCredentialsProvider amazonAWSCredentialsProvider() {
+    private AWSCredentialsProvider amazonAWSCredentialsProvider() {
         return new AWSStaticCredentialsProvider(amazonAWSCredentials());
-    }*/
+    }
 
-    /*@Bean
+    @Bean
     public AWSCredentials amazonAWSCredentials() {
         return new BasicAWSCredentials(amazonAWSAccessKey, amazonAWSSecretKey);
-    }*/
+    }
 }
