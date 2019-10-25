@@ -23,12 +23,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class DynamoDBEntityMetadataSupport<T, ID> implements DynamoDBHashKeyExtractingEntityMetadata<T> {
+public class DynamoDBEntityMetadata<T> implements DynamoDBHashKeyExtractingEntityMetadata<T> {
     private final Class<T> domainType;
     private boolean hasRangeKey;
     private String hashKeyPropertyName;
     private List<String> globalIndexHashKeyPropertyNames;
     private List<String> globalIndexRangeKeyPropertyNames;
+
+    protected Method hashKeySetterMethod;
+    protected Method hashKeyGetterMethod;
+    protected Field hashKeyField;
+    protected Method rangeKeySetterMethod;
+    protected Method rangeKeyGetterMethod;
+    protected Field rangeKeyField;
 
     private String dynamoDBTableName;
     private Map<String, String[]> globalSecondaryIndexNames = new HashMap<>();
@@ -39,13 +46,13 @@ public class DynamoDBEntityMetadataSupport<T, ID> implements DynamoDBHashKeyExtr
     }
 
     /**
-     * Creates a new {@link DynamoDBEntityMetadataSupport} for the given domain
+     * Creates a new {@link DynamoDBEntityMetadata} for the given domain
      * type.
      *
      * @param domainType
      *            must not be {@literal null}.
      */
-    public DynamoDBEntityMetadataSupport(final Class<T> domainType) {
+    public DynamoDBEntityMetadata(final Class<T> domainType) {
 
         Assert.notNull(domainType, "Domain type must not be null!");
         this.domainType = domainType;
@@ -58,6 +65,24 @@ public class DynamoDBEntityMetadataSupport<T, ID> implements DynamoDBHashKeyExtr
         this.globalSecondaryIndexNames = new HashMap<>();
         this.globalIndexHashKeyPropertyNames = new ArrayList<>();
         this.globalIndexRangeKeyPropertyNames = new ArrayList<>();
+
+        ReflectionUtils.doWithMethods(domainType, method -> {
+            if (method.getAnnotation(DynamoDBHashKey.class) != null) {
+                String setterMethodName = toSetterMethodNameFromAccessorMethod(method);
+                if (setterMethodName != null) {
+                    hashKeySetterMethod = ReflectionUtils.findMethod(domainType, setterMethodName,
+                            method.getReturnType());
+                    String getterMethodName = toGetterMethodNameFromAccessorMethod(method);
+                    hashKeyGetterMethod = ReflectionUtils.findMethod(domainType, getterMethodName);
+
+                }
+            }
+        });
+        ReflectionUtils.doWithFields(domainType, field -> {
+            if (field.getAnnotation(DynamoDBHashKey.class) != null) {
+                hashKeyField = ReflectionUtils.findField(domainType, field.getName());
+            }
+        });
         ReflectionUtils.doWithMethods(domainType, method -> {
             if (method.getAnnotation(DynamoDBHashKey.class) != null) {
                 hashKeyPropertyName = getPropertyNameForAccessorMethod(method);
@@ -95,17 +120,6 @@ public class DynamoDBEntityMetadataSupport<T, ID> implements DynamoDBHashKeyExtr
         Assert.notNull(hashKeyPropertyName, "Unable to find hash key field or getter method on " + domainType + "!");
     }
 
-    public DynamoDBEntityInformation<T, ID> getEntityInformation() {
-
-        if (hasRangeKey) {
-            DynamoDBHashAndRangeKeyExtractingEntityMetadataImpl<T, ID> metadata = new DynamoDBHashAndRangeKeyExtractingEntityMetadataImpl<T, ID>(
-                    domainType);
-            return new DynamoDBIdIsHashAndRangeKeyEntityInformationImpl<>(domainType, metadata);
-        } else {
-            return new DynamoDBIdIsHashKeyEntityInformationImpl<>(domainType, this);
-        }
-    }
-
     /*
      * (non-Javadoc)
      *
@@ -139,6 +153,16 @@ public class DynamoDBEntityMetadataSupport<T, ID> implements DynamoDBHashKeyExtr
         String accessorMethodName = method.getName();
         if (accessorMethodName.startsWith("get")) {
             return "set" + accessorMethodName.substring(3);
+        } else if (accessorMethodName.startsWith("is")) {
+            return "is" + accessorMethodName.substring(2);
+        }
+        return null;
+    }
+
+    protected String toGetterMethodNameFromAccessorMethod(Method method) {
+        String accessorMethodName = method.getName();
+        if (accessorMethodName.startsWith("set")) {
+            return "get" + accessorMethodName.substring(3);
         } else if (accessorMethodName.startsWith("is")) {
             return "is" + accessorMethodName.substring(2);
         }
@@ -401,6 +425,11 @@ public class DynamoDBEntityMetadataSupport<T, ID> implements DynamoDBHashKeyExtr
     }
 
     @Override
+    public boolean isRangeKeyAware() {
+        return hasRangeKey;
+    }
+
+    @Override
     public Map<String, String[]> getGlobalSecondaryIndexNamesByPropertyName() {
         return globalSecondaryIndexNames;
     }
@@ -413,5 +442,14 @@ public class DynamoDBEntityMetadataSupport<T, ID> implements DynamoDBHashKeyExtr
     @Override
     public boolean isGlobalIndexRangeKeyProperty(String propertyName) {
         return globalIndexRangeKeyPropertyNames.contains(propertyName);
+    }
+
+    @Override
+    public Object getHashKey(T id) {
+        if (hashKeyGetterMethod != null) {
+            return ReflectionUtils.invokeMethod(hashKeyGetterMethod, id);
+        } else {
+            return ReflectionUtils.getField(hashKeyField, id);
+        }
     }
 }

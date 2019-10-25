@@ -24,4 +24,12 @@ public interface DynamoDBHashKeyExtractingEntityMetadata<T> {
     boolean isGlobalIndexRangeKeyProperty(String propertyName);
 
     Class<T> getJavaType();
+
+    Object getHashKey(T id);
+
+    default Object getRangeKey(T id) {
+        return null;
+    }
+
+    boolean isRangeKeyAware();
 }

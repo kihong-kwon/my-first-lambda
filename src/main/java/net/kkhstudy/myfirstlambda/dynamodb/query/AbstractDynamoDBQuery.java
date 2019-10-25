@@ -1,4 +1,4 @@
 package net.kkhstudy.myfirstlambda.dynamodb.query;
 
-public abstract class AbstractDynamoDBQuery<T, ID> implements DynamoDBQueryCriteria<T, ID> {
+public abstract class AbstractDynamoDBQuery<T> implements DynamoDBQueryCriteria<T> {
 }

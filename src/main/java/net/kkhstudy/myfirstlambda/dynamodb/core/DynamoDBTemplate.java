@@ -14,23 +14,18 @@ import com.amazonaws.services.dynamodbv2.model.QueryResult;
 import com.amazonaws.services.dynamodbv2.model.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DynamoDBTemplate implements DynamoDBOperations, ApplicationContextAware {
+public class DynamoDBTemplate implements DynamoDBOperations {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamoDBTemplate.class);
     private final DynamoDBMapper dynamoDBMapper;
     private final AmazonDynamoDB amazonDynamoDB;
     private final DynamoDBMapperConfig dynamoDBMapperConfig;
-    private ApplicationEventPublisher eventPublisher;
 
     /**
      * Initializes a new {@code DynamoDBTemplate}. The following combinations are
@@ -57,11 +52,6 @@ public class DynamoDBTemplate implements DynamoDBOperations, ApplicationContextA
         this.amazonDynamoDB = amazonDynamoDB;
         this.dynamoDBMapper = dynamoDBMapper;
         this.dynamoDBMapperConfig = dynamoDBMapperConfig;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.eventPublisher = applicationContext;
     }
 
     @Override
