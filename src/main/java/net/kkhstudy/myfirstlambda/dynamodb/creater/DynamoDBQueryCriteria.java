@@ -1,6 +1,8 @@
-package net.kkhstudy.myfirstlambda.dynamodb.query;
+package net.kkhstudy.myfirstlambda.dynamodb.creater;
 
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import net.kkhstudy.myfirstlambda.dynamodb.core.DynamoDBOperations;
+import net.kkhstudy.myfirstlambda.dynamodb.query.Query;
 
 import java.util.Optional;
 
@@ -21,14 +23,14 @@ public interface DynamoDBQueryCriteria<T> {
 
     DynamoDBQueryCriteria<T> withPropertyBetween(String segment, Object value1, Object value2, Class<?> type);
 
-    //DynamoDBQueryCriteria<T, ID> withSort(Sort sort);
+    DynamoDBQueryCriteria<T> withSort(Sort sort);
 
     DynamoDBQueryCriteria<T> withProjection(Optional<String> projection);
 
     DynamoDBQueryCriteria<T> withLimit(Optional<Integer> limit);
 
-    //Query<T> buildQuery(DynamoDBOperations dynamoDBOperations);
+    Query<T> buildQuery(DynamoDBOperations dynamoDBOperations);
 
-    //Query<Long> buildCountQuery(DynamoDBOperations dynamoDBOperations, boolean pageQuery);
+    Query<Long> buildCountQuery(DynamoDBOperations dynamoDBOperations, boolean pageQuery);
 
 }
