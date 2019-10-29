@@ -1,20 +1,17 @@
 package net.kkhstudy.myfirstlambda.dynamodb.support;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DynamoDBHashAndRangeKeyExtractingEntityMetadataImpl<T> extends DynamoDBEntityMetadata<T>
-        implements DynamoDBHashAndRangeKeyExtractingEntityMetadata<T> {
+public class DynamoDBHashAndRangeKeyMetadataImpl<T> extends DynamoDBEntityMetadataImpl<T>
+        implements DynamoDBHashAndRangeKeyMetadata<T> {
 
-    public DynamoDBHashAndRangeKeyExtractingEntityMetadataImpl(final Class<T> domainType) {
+    public DynamoDBHashAndRangeKeyMetadataImpl(final Class<T> domainType) {
         super(domainType);
         ReflectionUtils.doWithMethods(domainType, method -> {
             if (method.getAnnotation(DynamoDBRangeKey.class) != null) {

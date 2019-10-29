@@ -1,9 +1,9 @@
-package net.kkhstudy.myfirstlambda.dynamodb.creater;
+package net.kkhstudy.myfirstlambda.dynamodb.query;
 
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import net.kkhstudy.myfirstlambda.dynamodb.core.DynamoDBOperations;
-import net.kkhstudy.myfirstlambda.dynamodb.query.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -29,8 +29,8 @@ public interface DynamoDBQueryCriteria<T> {
 
     DynamoDBQueryCriteria<T> withLimit(Optional<Integer> limit);
 
-    Query<T> buildQuery(DynamoDBOperations dynamoDBOperations);
+    List<T> buildQuery(DynamoDBOperations dynamoDBOperations);
 
-    Query<Long> buildCountQuery(DynamoDBOperations dynamoDBOperations, boolean pageQuery);
+    Long buildCountQuery(DynamoDBOperations dynamoDBOperations, boolean pageQuery);
 
 }

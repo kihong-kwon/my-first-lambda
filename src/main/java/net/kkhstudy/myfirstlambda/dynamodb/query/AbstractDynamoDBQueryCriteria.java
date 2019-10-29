@@ -1,19 +1,34 @@
-package net.kkhstudy.myfirstlambda.dynamodb.creater;
+package net.kkhstudy.myfirstlambda.dynamodb.query;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.*;
-import com.amazonaws.services.dynamodbv2.model.*;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperFieldModel;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperTableModel;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMarshaller;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverter;
+import com.amazonaws.services.dynamodbv2.datamodeling.marshallers.DateSetToStringSetMarshaller;
+import com.amazonaws.services.dynamodbv2.datamodeling.marshallers.DateToStringMarshaller;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import com.amazonaws.services.dynamodbv2.model.Condition;
+import com.amazonaws.services.dynamodbv2.model.QueryRequest;
+import com.amazonaws.services.dynamodbv2.model.Select;
 import net.kkhstudy.myfirstlambda.dynamodb.core.DynamoDBOperations;
 import net.kkhstudy.myfirstlambda.dynamodb.support.DynamoDBEntityMetadata;
-import org.socialsignin.spring.data.dynamodb.marshaller.Date2IsoDynamoDBMarshaller;
-import org.socialsignin.spring.data.dynamodb.query.Query;
-import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryCriteria<T> {
     protected Class<T> clazz;
@@ -75,7 +90,7 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
                 }
             }
 
-            for (Sort.Order order : sort) {
+            for (Sort.Order order : sort.getOrders()) {
                 final String sortProperty = order.getProperty();
                 if (entityInformation.isGlobalIndexRangeKeyProperty(sortProperty)) {
                     allowedSortProperties.add(sortProperty);
@@ -105,13 +120,13 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
         }
 
         boolean sortAlreadySet = false;
-        for (Sort.Order order : sort) {
+        for (Sort.Order order : sort.getOrders()) {
             if (permittedPropertyNames.contains(order.getProperty())) {
                 if (sortAlreadySet) {
                     throw new UnsupportedOperationException("Sorting by multiple attributes not possible");
 
                 }
-                queryExpression.setScanIndexForward(order.getDirection().equals(Direction.ASC));
+                queryExpression.setScanIndexForward(order.getDirection().equals(Sort.Direction.ASC));
                 sortAlreadySet = true;
             } else {
                 throw new UnsupportedOperationException(
@@ -126,7 +141,7 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
         }
 
         boolean sortAlreadySet = false;
-        for (Sort.Order order : sort) {
+        for (Sort.Order order : sort.getOrders()) {
             if (permittedPropertyNames.contains(order.getProperty())) {
                 if (sortAlreadySet) {
                     throw new UnsupportedOperationException("Sorting by multiple attributes not possible");
@@ -137,7 +152,7 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
                             "Sorting for global index queries with criteria on both hash and range not possible");
 
                 }
-                queryRequest.setScanIndexForward(order.getDirection().equals(Direction.ASC));
+                queryRequest.setScanIndexForward(order.getDirection().equals(Sort.Direction.ASC));
                 sortAlreadySet = true;
             } else {
                 throw new UnsupportedOperationException("Sorting only possible by " + permittedPropertyNames
@@ -391,7 +406,7 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
     }
 
     @Override
-    public Query<T> buildQuery(DynamoDBOperations dynamoDBOperations) {
+    public List<T> buildQuery(DynamoDBOperations dynamoDBOperations) {
         if (isApplicableForLoad()) {
             return buildSingleEntityLoadQuery(dynamoDBOperations);
         } else {
@@ -400,7 +415,7 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
     }
 
     @Override
-    public Query<Long> buildCountQuery(DynamoDBOperations dynamoDBOperations, boolean pageQuery) {
+    public Long buildCountQuery(DynamoDBOperations dynamoDBOperations, boolean pageQuery) {
         if (isApplicableForLoad()) {
             return buildSingleEntityCountQuery(dynamoDBOperations);
         } else {
@@ -408,13 +423,13 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
         }
     }
 
-    protected abstract Query<T> buildSingleEntityLoadQuery(DynamoDBOperations dynamoDBOperations);
+    protected abstract List<T> buildSingleEntityLoadQuery(DynamoDBOperations dynamoDBOperations);
 
-    protected abstract Query<Long> buildSingleEntityCountQuery(DynamoDBOperations dynamoDBOperations);
+    protected abstract Long buildSingleEntityCountQuery(DynamoDBOperations dynamoDBOperations);
 
-    protected abstract Query<T> buildFinderQuery(DynamoDBOperations dynamoDBOperations);
+    protected abstract List<T> buildFinderQuery(DynamoDBOperations dynamoDBOperations);
 
-    protected abstract Query<Long> buildFinderCountQuery(DynamoDBOperations dynamoDBOperations, boolean pageQuery);
+    protected abstract Long buildFinderCountQuery(DynamoDBOperations dynamoDBOperations, boolean pageQuery);
 
     protected abstract boolean isOnlyHashKeySpecified();
 
@@ -433,7 +448,6 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
         return this;
     }
 
-    @SuppressWarnings({"deprecation", "unchecked"})
     protected <V extends Object> Object getPropertyAttributeValue(final String propertyName, final V value) {
         // TODO consider removing DynamoDBMarshaller code altogether as table model will
         // handle accordingly
@@ -444,12 +458,7 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
             return converter.convert(value);
         }
 
-        DynamoDBMarshaller<V> marshaller = (DynamoDBMarshaller<V>) entityInformation
-                .getMarshallerForProperty(propertyName);
-
-        if (marshaller != null) {
-            return marshaller.marshall(value);
-        } else if (tableModel != null) { // purely here for testing as DynamoDBMapperTableModel cannot be mocked using
+        if (tableModel != null) { // purely here for testing as DynamoDBMapperTableModel cannot be mocked using
             // Mockito
 
             String attributeName = getAttributeName(propertyName);
@@ -482,20 +491,6 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
         return list;
     }
 
-    @SuppressWarnings("deprecation")
-    private List<String> getDateListAsStringList(List<Date> dateList) {
-        DynamoDBMarshaller<Date> marshaller = new Date2IsoDynamoDBMarshaller();
-        List<String> list = new ArrayList<String>();
-        for (Date date : dateList) {
-            if (date != null) {
-                list.add(marshaller.marshall(date));
-            } else {
-                list.add(null);
-            }
-        }
-        return list;
-    }
-
     private List<String> getBooleanListAsStringList(List<Boolean> booleanList) {
         List<String> list = new ArrayList<>();
         for (Boolean booleanValue : booleanList) {
@@ -508,7 +503,6 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
         return list;
     }
 
-    @SuppressWarnings("unchecked")
     @Nullable
     private <P> List<P> getAttributeValueAsList(@Nullable Object attributeValue) {
         if (attributeValue == null) {
@@ -558,12 +552,10 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
         } else if (ClassUtils.isAssignable(Date.class, propertyType)) {
             List<Date> attributeValueAsList = getAttributeValueAsList(attributeValue);
             if (expandCollectionValues && attributeValueAsList != null) {
-                List<String> attributeValueAsStringList = getDateListAsStringList(attributeValueAsList);
-                attributeValueObject.withSS(attributeValueAsStringList);
+                attributeValueObject = DateSetToStringSetMarshaller.instance().marshall(attributeValueAsList);
             } else {
                 Date date = (Date) attributeValue;
-                String marshalledDate = new Date2IsoDynamoDBMarshaller().marshall(date);
-                attributeValueObject.withS(marshalledDate);
+                attributeValueObject = DateToStringMarshaller.instance().marshall(date);
             }
         } else {
             throw new RuntimeException("Cannot create condition for type:" + attributeValue.getClass()
@@ -585,8 +577,8 @@ public abstract class AbstractDynamoDBQueryCriteria<T> implements DynamoDBQueryC
         if (ClassUtils.isAssignableValue(AttributeValue.class, attributeValue)) {
             attributeValueList.add((AttributeValue) attributeValue);
         } else {
-            boolean marshalled = !alreadyMarshalledIfRequired && attributeValue != o
-                    && !entityInformation.isCompositeHashAndRangeKeyProperty(propertyName);
+            boolean marshalled = !alreadyMarshalledIfRequired && attributeValue != o;
+                    //&& !entityInformation.isCompositeHashAndRangeKeyProperty(propertyName);
 
             Class<?> targetPropertyType = marshalled ? String.class : propertyType;
             addAttributeValue(attributeValueList, attributeValue, targetPropertyType, true);
