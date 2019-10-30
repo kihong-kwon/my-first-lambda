@@ -3,6 +3,7 @@ package net.kkhstudy.myfirstlambda.dynamodb.query;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperTableModel;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import net.kkhstudy.myfirstlambda.dynamodb.core.DynamoDBOperations;
+import net.kkhstudy.myfirstlambda.dynamodb.support.DynamoDBEntityMetadata;
 import net.kkhstudy.myfirstlambda.dynamodb.support.DynamoDBEntityMetadataImpl;
 import net.kkhstudy.myfirstlambda.dynamodb.support.DynamoDBHashAndRangeKeyMetadata;
 import org.springframework.util.Assert;
@@ -15,12 +16,12 @@ import java.util.Optional;
 
 public class AbstractDynamoDBQueryCreator<T> {
 
-    protected final DynamoDBEntityMetadataImpl<T> entityMetadata;
+    protected final DynamoDBEntityMetadata<T> entityMetadata;
     protected final DynamoDBOperations dynamoDBOperations;
     protected final Optional<String> projection;
     protected final Optional<Integer> limit;
 
-    public AbstractDynamoDBQueryCreator(DynamoDBEntityMetadataImpl<T> entityMetadata,
+    public AbstractDynamoDBQueryCreator(DynamoDBEntityMetadata<T> entityMetadata,
                                         Optional<String> projection, Optional<Integer> limitResults, DynamoDBOperations dynamoDBOperations) {
         //super(tree);
         this.entityMetadata = entityMetadata;

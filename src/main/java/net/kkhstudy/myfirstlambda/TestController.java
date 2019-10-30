@@ -2,13 +2,19 @@ package net.kkhstudy.myfirstlambda;
 
 import net.kkhstudy.myfirstlambda.dao.TestDao;
 import net.kkhstudy.myfirstlambda.data.DemoRequest;
+import net.kkhstudy.myfirstlambda.dynamodb.query.DynamoDBEntityWithHashAndRangeKeyCriteria;
+import net.kkhstudy.myfirstlambda.dynamodb.query.DynamoDBQueryCreator;
+import net.kkhstudy.myfirstlambda.dynamodb.query.DynamoDBQueryCriteria;
 import net.kkhstudy.myfirstlambda.entity.DynamoDemoEntity;
+import net.kkhstudy.myfirstlambda.repository.TestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -17,13 +23,23 @@ public class TestController {
     @Autowired
     private TestDao testDao;
 
+    @Autowired
+    private TestRepository testRepository;
+
+    @Autowired
+    DynamoDBQueryCreator<DynamoDemoEntity> dynamoDBQueryCreator;
+
     @RequestMapping(value = "/createEntity", method = {RequestMethod.POST})
     public DynamoDemoEntity createEntity(@RequestBody DemoRequest request) {
         DynamoDemoEntity entity = new DynamoDemoEntity();
         entity.setTitle(request.getTitle());
         entity.setAuthor(request.getAuthor());
         entity.setDescription(request.getDescription());
-        testDao.createEntity(entity);
+
+        testRepository.save(entity);
+
+        DynamoDBQueryCriteria<DynamoDemoEntity> criteria =  dynamoDBQueryCreator.addCriteria(String.class, "SIMPLE_PROPERTY", "author", Arrays.asList((Object)"test1").iterator());
+        List<DynamoDemoEntity> ret =  dynamoDBQueryCreator.complete(criteria, null);
 
         return entity;
     }

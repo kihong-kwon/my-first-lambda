@@ -15,12 +15,14 @@ import com.amazonaws.services.dynamodbv2.model.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component
 public class DynamoDBTemplate implements DynamoDBOperations {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamoDBTemplate.class);
     private final DynamoDBMapper dynamoDBMapper;

@@ -72,9 +72,8 @@ public class DynamoDBEntityMetadataImpl<T> implements DynamoDBEntityMetadata<T> 
                 if (setterMethodName != null) {
                     hashKeySetterMethod = ReflectionUtils.findMethod(domainType, setterMethodName,
                             method.getReturnType());
-                    String getterMethodName = toGetterMethodNameFromAccessorMethod(method);
+                    String getterMethodName = toGetterMethodNameFromAccessorMethod(hashKeySetterMethod);
                     hashKeyGetterMethod = ReflectionUtils.findMethod(domainType, getterMethodName);
-
                 }
             }
         });

@@ -19,7 +19,7 @@ public class DynamoDBHashAndRangeKeyMetadataImpl<T> extends DynamoDBEntityMetada
                 if (setterMethodName != null) {
                     rangeKeySetterMethod = ReflectionUtils.findMethod(domainType, setterMethodName,
                             method.getReturnType());
-                    String getterMethodName = toGetterMethodNameFromAccessorMethod(method);
+                    String getterMethodName = toGetterMethodNameFromAccessorMethod(rangeKeySetterMethod);
                     rangeKeyGetterMethod = ReflectionUtils.findMethod(domainType, getterMethodName);
                 }
             }

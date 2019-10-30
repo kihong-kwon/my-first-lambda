@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.KeyPair;
 import net.kkhstudy.myfirstlambda.dynamodb.core.DynamoDBOperations;
-import net.kkhstudy.myfirstlambda.dynamodb.support.DynamoDBEntityMetadataImpl;
+import net.kkhstudy.myfirstlambda.dynamodb.support.DynamoDBEntityMetadata;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class SimpleDynamoDBCrudRepository<T> implements DynamoDBCrudRepository<T> {
-    protected DynamoDBEntityMetadataImpl<T> dynamoDBEntityMetadata;
+    protected DynamoDBEntityMetadata<T> dynamoDBEntityMetadata;
 
     protected Class<T> domainType;
 
     protected DynamoDBOperations dynamoDBOperations;
 
-    public SimpleDynamoDBCrudRepository(DynamoDBEntityMetadataImpl<T> dynamoDBEntityMetadata,
+    public SimpleDynamoDBCrudRepository(DynamoDBEntityMetadata<T> dynamoDBEntityMetadata,
                                         DynamoDBOperations dynamoDBOperations) {
         this.dynamoDBEntityMetadata = dynamoDBEntityMetadata;
         this.dynamoDBOperations = dynamoDBOperations;
@@ -155,7 +155,7 @@ public class SimpleDynamoDBCrudRepository<T> implements DynamoDBCrudRepository<T
     }
 
     @NonNull
-    public DynamoDBEntityMetadataImpl<T> getDynamoDBEntityMetadata() {
+    public DynamoDBEntityMetadata<T> getDynamoDBEntityMetadata() {
         return this.dynamoDBEntityMetadata;
     }
 }

@@ -7,7 +7,7 @@ import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.services.dynamodbv2.model.Select;
 import net.kkhstudy.myfirstlambda.dynamodb.core.DynamoDBOperations;
-import net.kkhstudy.myfirstlambda.dynamodb.support.DynamoDBEntityMetadataImpl;
+import net.kkhstudy.myfirstlambda.dynamodb.support.DynamoDBEntityMetadata;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,9 +16,9 @@ import java.util.Map;
 
 public class DynamoDBEntityWithHashKeyOnlyCriteria<T> extends AbstractDynamoDBQueryCriteria<T> {
 
-    private DynamoDBEntityMetadataImpl<T> entityInformation;
+    private DynamoDBEntityMetadata<T> entityInformation;
 
-    public DynamoDBEntityWithHashKeyOnlyCriteria(DynamoDBEntityMetadataImpl<T> entityInformation,
+    public DynamoDBEntityWithHashKeyOnlyCriteria(DynamoDBEntityMetadata<T> entityInformation,
                                                  DynamoDBMapperTableModel<T> tableModel) {
         super(entityInformation, tableModel);
         this.entityInformation = entityInformation;

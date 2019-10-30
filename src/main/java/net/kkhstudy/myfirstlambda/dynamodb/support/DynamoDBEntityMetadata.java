@@ -1,6 +1,5 @@
 package net.kkhstudy.myfirstlambda.dynamodb.support;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMarshaller;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverter;
 
 import java.util.Map;
