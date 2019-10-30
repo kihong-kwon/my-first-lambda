@@ -2,9 +2,7 @@ package net.kkhstudy.myfirstlambda;
 
 import net.kkhstudy.myfirstlambda.dao.TestDao;
 import net.kkhstudy.myfirstlambda.data.DemoRequest;
-import net.kkhstudy.myfirstlambda.dynamodb.query.DynamoDBEntityWithHashAndRangeKeyCriteria;
 import net.kkhstudy.myfirstlambda.dynamodb.query.DynamoDBQueryCreator;
-import net.kkhstudy.myfirstlambda.dynamodb.query.DynamoDBQueryCriteria;
 import net.kkhstudy.myfirstlambda.entity.DynamoDemoEntity;
 import net.kkhstudy.myfirstlambda.repository.TestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -35,12 +32,12 @@ public class TestController {
         entity.setTitle(request.getTitle());
         entity.setAuthor(request.getAuthor());
         entity.setDescription(request.getDescription());
-
         testRepository.save(entity);
 
-        DynamoDBQueryCriteria<DynamoDemoEntity> criteria =  dynamoDBQueryCreator.addCriteria(String.class, "SIMPLE_PROPERTY", "author", Arrays.asList((Object)"test1").iterator());
-        List<DynamoDemoEntity> ret =  dynamoDBQueryCreator.complete(criteria, null);
-
+        List<DynamoDemoEntity> ret = dynamoDBQueryCreator
+                                        .addCriteria(String.class, "SIMPLE_PROPERTY", "title", Arrays.asList((Object)"test1").iterator())
+                                        .and(String.class, "SIMPLE_PROPERTY", "author", Arrays.asList((Object)"test1").iterator())
+                                        .complete(null);
         return entity;
     }
 

@@ -1,24 +1,14 @@
 package net.kkhstudy.myfirstlambda.dynamodb.query;
 
-import net.kkhstudy.myfirstlambda.dynamodb.core.DynamoDBOperations;
-import net.kkhstudy.myfirstlambda.dynamodb.support.DynamoDBEntityMetadata;
-import org.springframework.lang.Nullable;
-
+import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
-public class DynamoDBQueryCreator<T> extends AbstractDynamoDBQueryCreator<T> {
+public interface DynamoDBQueryCreator<T> {
 
-    public DynamoDBQueryCreator(DynamoDBEntityMetadata<T> entityMetadata,
-                                Optional<String> projection, Optional<Integer> limitResults, DynamoDBOperations dynamoDBOperations) {
-        super(entityMetadata, projection, limitResults, dynamoDBOperations);
-    }
+    DynamoDBQueryCreator<T> addCriteria(Class<?> propertyType, String operation, String propertiName, Iterator<Object> iterator);
 
-    public List<T> complete(@Nullable DynamoDBQueryCriteria<T> criteria, Sort sort) {
-        criteria.withSort(sort);
-        criteria.withProjection(projection);
-        criteria.withLimit(limit);
-        return criteria.buildQuery(dynamoDBOperations);
-    }
+    List<T> complete(Sort sort);
+
+    DynamoDBQueryCreator<T> and(Class<?> propertyType, String operation, String propertiName, Iterator<Object> iterator);
 
 }

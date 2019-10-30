@@ -29,21 +29,6 @@ public class DynamoDBTemplate implements DynamoDBOperations {
     private final AmazonDynamoDB amazonDynamoDB;
     private final DynamoDBMapperConfig dynamoDBMapperConfig;
 
-    /**
-     * Initializes a new {@code DynamoDBTemplate}. The following combinations are
-     * valid:
-     *
-     * @param amazonDynamoDB
-     *            must not be {@code null}
-     * @param dynamoDBMapperConfig
-     *            can be {@code null} - {@link DynamoDBMapperConfig#DEFAULT} is used
-     *            if {@code null} is passed in
-     * @param dynamoDBMapper
-     *            can be {@code null} -
-     *            {@link DynamoDBMapper#DynamoDBMapper(AmazonDynamoDB, DynamoDBMapperConfig)}
-     *            is used if {@code null} is passed in
-     * @param dynamoDBMapperConfig
-     */
     @Autowired
     public DynamoDBTemplate(AmazonDynamoDB amazonDynamoDB, DynamoDBMapper dynamoDBMapper,
                             DynamoDBMapperConfig dynamoDBMapperConfig) {

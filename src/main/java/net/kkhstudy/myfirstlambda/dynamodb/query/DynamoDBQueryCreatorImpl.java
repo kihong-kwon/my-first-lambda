@@ -12,16 +12,18 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
-public class AbstractDynamoDBQueryCreator<T> {
+public class DynamoDBQueryCreatorImpl<T> implements DynamoDBQueryCreator<T> {
 
     protected final DynamoDBEntityMetadata<T> entityMetadata;
     protected final DynamoDBOperations dynamoDBOperations;
     protected final Optional<String> projection;
     protected final Optional<Integer> limit;
+    protected DynamoDBQueryCriteria<T> criteria;
 
-    public AbstractDynamoDBQueryCreator(DynamoDBEntityMetadata<T> entityMetadata,
+    public DynamoDBQueryCreatorImpl(DynamoDBEntityMetadata<T> entityMetadata,
                                         Optional<String> projection, Optional<Integer> limitResults, DynamoDBOperations dynamoDBOperations) {
         //super(tree);
         this.entityMetadata = entityMetadata;
@@ -30,10 +32,10 @@ public class AbstractDynamoDBQueryCreator<T> {
         this.dynamoDBOperations = dynamoDBOperations;
     }
 
-    public DynamoDBQueryCriteria<T> addCriteria(Class<?> propertyType, String operation, String propertiName,
-                                                       Iterator<Object> iterator) {
+    @Override
+    public DynamoDBQueryCreator<T> addCriteria(Class<?> propertyType, String operation, String propertiName, Iterator<Object> iterator) {
         final DynamoDBMapperTableModel<T> tableModel = dynamoDBOperations.getTableModel(entityMetadata.getJavaType());
-        DynamoDBQueryCriteria<T> criteria = entityMetadata.isRangeKeyAware()
+        criteria = entityMetadata.isRangeKeyAware()
                 ? new DynamoDBEntityWithHashAndRangeKeyCriteria<T>(
                 (DynamoDBHashAndRangeKeyMetadata<T>) entityMetadata, tableModel)
                 : new DynamoDBEntityWithHashKeyOnlyCriteria<T>(entityMetadata, tableModel);
@@ -47,48 +49,75 @@ public class AbstractDynamoDBQueryCreator<T> {
                 boolean isArray = ObjectUtils.isArray(in);
                 Assert.isTrue(isIterable || isArray, "In criteria can only operate with Iterable or Array parameters");
                 Iterable<?> iterable = isIterable ? ((Iterable<?>) in) : Arrays.asList(ObjectUtils.toObjectArray(in));
-                return criteria.withPropertyIn(propertiName, iterable, propertyType);
+                criteria.withPropertyIn(propertiName, iterable, propertyType);
+                return this;
             case "CONTAINING" :
-                return criteria.withSingleValueCriteria(propertiName, ComparisonOperator.CONTAINS,
+                criteria.withSingleValueCriteria(propertiName, ComparisonOperator.CONTAINS,
                         iterator.next(), propertyType);
+                return this;
             case "STARTING_WITH" :
-                return criteria.withSingleValueCriteria(propertiName, ComparisonOperator.BEGINS_WITH,
+                criteria.withSingleValueCriteria(propertiName, ComparisonOperator.BEGINS_WITH,
                         iterator.next(), propertyType);
+                return this;
             case "BETWEEN" :
                 Object first = iterator.next();
                 Object second = iterator.next();
-                return criteria.withPropertyBetween(propertiName, first, second, propertyType);
+                criteria.withPropertyBetween(propertiName, first, second, propertyType);
+                return this;
             case "AFTER" :
             case "GREATER_THAN" :
-                return criteria.withSingleValueCriteria(propertiName, ComparisonOperator.GT, iterator.next(),
+                criteria.withSingleValueCriteria(propertiName, ComparisonOperator.GT, iterator.next(),
                         propertyType);
+                return this;
             case "BEFORE" :
             case "LESS_THAN" :
-                return criteria.withSingleValueCriteria(propertiName, ComparisonOperator.LT, iterator.next(),
+                criteria.withSingleValueCriteria(propertiName, ComparisonOperator.LT, iterator.next(),
                         propertyType);
+                return this;
             case "GREATER_THAN_EQUAL" :
-                return criteria.withSingleValueCriteria(propertiName, ComparisonOperator.GE, iterator.next(),
+                criteria.withSingleValueCriteria(propertiName, ComparisonOperator.GE, iterator.next(),
                         propertyType);
+                return this;
             case "LESS_THAN_EQUAL" :
-                return criteria.withSingleValueCriteria(propertiName, ComparisonOperator.LE, iterator.next(),
+                criteria.withSingleValueCriteria(propertiName, ComparisonOperator.LE, iterator.next(),
                         propertyType);
+                return this;
             case "IS_NULL" :
-                return criteria.withNoValuedCriteria(propertiName, ComparisonOperator.NULL);
+                criteria.withNoValuedCriteria(propertiName, ComparisonOperator.NULL);
+                return this;
             case "IS_NOT_NULL" :
-                return criteria.withNoValuedCriteria(propertiName, ComparisonOperator.NOT_NULL);
+                criteria.withNoValuedCriteria(propertiName, ComparisonOperator.NOT_NULL);
+                return this;
             case "TRUE" :
-                return criteria.withSingleValueCriteria(propertiName, ComparisonOperator.EQ, Boolean.TRUE,
+                criteria.withSingleValueCriteria(propertiName, ComparisonOperator.EQ, Boolean.TRUE,
                         propertyType);
+                return this;
             case "FALSE" :
-                return criteria.withSingleValueCriteria(propertiName, ComparisonOperator.EQ, Boolean.FALSE,
+                criteria.withSingleValueCriteria(propertiName, ComparisonOperator.EQ, Boolean.FALSE,
                         propertyType);
+                return this;
             case "SIMPLE_PROPERTY" :
-                return criteria.withPropertyEquals(propertiName, iterator.next(), propertyType);
+                criteria.withPropertyEquals(propertiName, iterator.next(), propertyType);
+                return this;
             case "NEGATING_SIMPLE_PROPERTY" :
-                return criteria.withSingleValueCriteria(propertiName, ComparisonOperator.NE, iterator.next(),
+                criteria.withSingleValueCriteria(propertiName, ComparisonOperator.NE, iterator.next(),
                         propertyType);
+                return this;
             default :
                 throw new IllegalArgumentException("Unsupported keyword " + propertyType);
         }
+    }
+
+    @Override
+    public DynamoDBQueryCreator<T> and(Class<?> propertyType, String operation, String propertiName, Iterator<Object> iterator) {
+        return addCriteria(propertyType, operation, propertiName, iterator);
+    }
+
+    @Override
+    public List<T> complete(Sort sort) {
+        criteria.withSort(sort);
+        criteria.withProjection(projection);
+        criteria.withLimit(limit);
+        return criteria.buildQuery(dynamoDBOperations);
     }
 }

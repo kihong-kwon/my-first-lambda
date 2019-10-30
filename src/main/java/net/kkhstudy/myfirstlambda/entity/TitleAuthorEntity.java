@@ -4,20 +4,18 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName = "DemoEntity")
-public class DynamoDemoEntity implements IDemoEntity {
+@DynamoDBTable(tableName = "TitleAuthorEntity")
+public class TitleAuthorEntity {
     private String title;
     private String author;
     private String description;
     private Long price;
 
-    @Override
     @DynamoDBHashKey
     public String getTitle() {
         return title;
     }
 
-    @Override
     public void setTitle(String title) {
         this.title = title;
     }
@@ -31,12 +29,10 @@ public class DynamoDemoEntity implements IDemoEntity {
         this.author = author;
     }
 
-    @Override
     public String getDescription() {
         return this.description;
     }
 
-    @Override
     public void setDescription(String description) {
         this.description = description;
     }

@@ -1,6 +1,5 @@
 package net.kkhstudy.myfirstlambda.function;
 
-import net.kkhstudy.myfirstlambda.entity.IDemoEntity;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;

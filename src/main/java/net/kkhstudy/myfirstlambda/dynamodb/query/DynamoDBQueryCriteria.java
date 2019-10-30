@@ -6,10 +6,6 @@ import net.kkhstudy.myfirstlambda.dynamodb.core.DynamoDBOperations;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Michael Lavelle
- * @author Sebastian Just
- */
 public interface DynamoDBQueryCriteria<T> {
 
     DynamoDBQueryCriteria<T> withSingleValueCriteria(String propertyName, ComparisonOperator comparisonOperator,
