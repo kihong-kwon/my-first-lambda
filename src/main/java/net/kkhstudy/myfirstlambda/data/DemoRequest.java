@@ -11,4 +11,5 @@ public class DemoRequest {
     private String title;
     private String author;
     private String description;
+    private Long price;
 }

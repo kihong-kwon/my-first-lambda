@@ -9,7 +9,7 @@ import net.kkhstudy.myfirstlambda.entity.TitleAuthorEntity;
 import net.kkhstudy.myfirstlambda.function.CreateEntityFunction;
 import net.kkhstudy.myfirstlambda.function.GetEntityFunction;
 import net.kkhstudy.myfirstlambda.function.S3DrivenFunction;
-import net.kkhstudy.myfirstlambda.repository.TestRepository;
+import net.kkhstudy.myfirstlambda.repository.TitleAuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -49,9 +49,9 @@ public class MyFirstLambdaApplication {
     }
 
     @Bean
-    public TestRepository testRepository() {
-        TestRepository testRepository = new TestRepository(dynamoDBHashAndRangeKeyMetadata, dynamoDBOperations);
-        return testRepository;
+    public TitleAuthorRepository testRepository() {
+        TitleAuthorRepository titleAuthorRepository = new TitleAuthorRepository(dynamoDBHashAndRangeKeyMetadata, dynamoDBOperations);
+        return titleAuthorRepository;
     }
 
     @Bean

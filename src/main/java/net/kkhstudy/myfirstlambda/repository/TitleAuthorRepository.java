@@ -5,9 +5,9 @@ import net.kkhstudy.myfirstlambda.dynamodb.repository.SimpleDynamoDBCrudReposito
 import net.kkhstudy.myfirstlambda.dynamodb.support.DynamoDBEntityMetadata;
 import net.kkhstudy.myfirstlambda.entity.TitleAuthorEntity;
 
-public class TestRepository extends SimpleDynamoDBCrudRepository<TitleAuthorEntity> {
-    public TestRepository(DynamoDBEntityMetadata<TitleAuthorEntity> dynamoDBEntityMetadata,
-                          DynamoDBOperations dynamoDBOperations) {
+public class TitleAuthorRepository extends SimpleDynamoDBCrudRepository<TitleAuthorEntity> {
+    public TitleAuthorRepository(DynamoDBEntityMetadata<TitleAuthorEntity> dynamoDBEntityMetadata,
+                                 DynamoDBOperations dynamoDBOperations) {
         super(dynamoDBEntityMetadata, dynamoDBOperations);
     }
 }

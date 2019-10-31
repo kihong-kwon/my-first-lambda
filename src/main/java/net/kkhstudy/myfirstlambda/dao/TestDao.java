@@ -7,7 +7,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.QueryResultPage;
 import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import net.kkhstudy.myfirstlambda.entity.DynamoDemoEntity;
+import net.kkhstudy.myfirstlambda.entity.TitleAuthorEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,40 +25,40 @@ public class TestDao {
     @Autowired
     private DynamoDBMapper dynamoDBMapper;
 
-    public void createEntity(DynamoDemoEntity entity) {
+    public void createEntity(TitleAuthorEntity entity) {
         dynamoDBMapper.save(entity);
     }
 
-    public void deleteEntity(DynamoDemoEntity entity) {
+    public void deleteEntity(TitleAuthorEntity entity) {
         dynamoDBMapper.delete(entity);
     }
 
-    public DynamoDemoEntity getDemoEntity(String title) {
+    public TitleAuthorEntity getDemoEntity(String title) {
         DynamoDBMapperConfig config = DynamoDBMapperConfig.builder()
                 .withConsistentReads(DynamoDBMapperConfig.ConsistentReads.CONSISTENT)
                 .build();
-        DynamoDemoEntity entity = dynamoDBMapper.load(DynamoDemoEntity.class, title, config);
+        TitleAuthorEntity entity = dynamoDBMapper.load(TitleAuthorEntity.class, title, config);
         return entity;
     }
 
-    public DynamoDemoEntity getDemoEntity(String title, String author) {
+    public TitleAuthorEntity getDemoEntity(String title, String author) {
         DynamoDBMapperConfig config = DynamoDBMapperConfig.builder()
                 .withConsistentReads(DynamoDBMapperConfig.ConsistentReads.CONSISTENT)
                 .build();
-        DynamoDemoEntity entity = dynamoDBMapper.load(DynamoDemoEntity.class, title, author, config);
+        TitleAuthorEntity entity = dynamoDBMapper.load(TitleAuthorEntity.class, title, author, config);
         return entity;
     }
 
-    public QueryResultPage<DynamoDemoEntity> getDemoEntityListUsingQueryPage(String title) {
+    public QueryResultPage<TitleAuthorEntity> getDemoEntityListUsingQueryPage(String title) {
         // queryPageはKey属性に対して検索条件に設定可能。
-        DynamoDemoEntity entity = new DynamoDemoEntity();
+        TitleAuthorEntity entity = new TitleAuthorEntity();
         entity.setTitle(title);
-        DynamoDBQueryExpression<DynamoDemoEntity> queryExpression = new DynamoDBQueryExpression<DynamoDemoEntity>()
+        DynamoDBQueryExpression<TitleAuthorEntity> queryExpression = new DynamoDBQueryExpression<TitleAuthorEntity>()
                 .withScanIndexForward(true) // true: ascending, false: descending
                 // .withIndexName() // indexから検索する場合
                 .withHashKeyValues(entity)
                 .withLimit(5);
-        QueryResultPage<DynamoDemoEntity> itemList = dynamoDBMapper.queryPage(DynamoDemoEntity.class, queryExpression);
+        QueryResultPage<TitleAuthorEntity> itemList = dynamoDBMapper.queryPage(TitleAuthorEntity.class, queryExpression);
         return itemList;
     }
 
@@ -68,7 +68,7 @@ public class TestDao {
         eav.put(":n", new AttributeValue().withN("100"));
 
         // scanPageはKey属性以外も検索条件に設定可能。
-        DynamoDemoEntity entity = new DynamoDemoEntity();
+        TitleAuthorEntity entity = new TitleAuthorEntity();
         entity.setTitle(title);
         DynamoDBScanExpression scanPageExpression = new DynamoDBScanExpression()
                 .withLimit(5)
@@ -77,7 +77,7 @@ public class TestDao {
                 .withExpressionAttributeValues(eav);
 
         do {
-            ScanResultPage<DynamoDemoEntity> scanPage = dynamoDBMapper.scanPage(DynamoDemoEntity.class, scanPageExpression);
+            ScanResultPage<TitleAuthorEntity> scanPage = dynamoDBMapper.scanPage(TitleAuthorEntity.class, scanPageExpression);
             System.out.println("LastEvaluatedKey=" + scanPage.getLastEvaluatedKey());
             scanPageExpression.setExclusiveStartKey(scanPage.getLastEvaluatedKey());
         } while (scanPageExpression.getExclusiveStartKey() != null);
@@ -86,11 +86,11 @@ public class TestDao {
     }
 
     public int getCountDemoEntityList(String title) {
-        DynamoDemoEntity entity = new DynamoDemoEntity();
+        TitleAuthorEntity entity = new TitleAuthorEntity();
         entity.setTitle(title);
-        DynamoDBQueryExpression<DynamoDemoEntity> queryExpression = new DynamoDBQueryExpression<DynamoDemoEntity>()
+        DynamoDBQueryExpression<TitleAuthorEntity> queryExpression = new DynamoDBQueryExpression<TitleAuthorEntity>()
                 .withHashKeyValues(entity);
-        int count = dynamoDBMapper.count(DynamoDemoEntity.class, queryExpression);
+        int count = dynamoDBMapper.count(TitleAuthorEntity.class, queryExpression);
         return count;
     }
 }

@@ -3,8 +3,8 @@ package net.kkhstudy.myfirstlambda;
 import net.kkhstudy.myfirstlambda.dao.TestDao;
 import net.kkhstudy.myfirstlambda.data.DemoRequest;
 import net.kkhstudy.myfirstlambda.dynamodb.query.DynamoDBQueryCreator;
-import net.kkhstudy.myfirstlambda.entity.DynamoDemoEntity;
-import net.kkhstudy.myfirstlambda.repository.TestRepository;
+import net.kkhstudy.myfirstlambda.entity.TitleAuthorEntity;
+import net.kkhstudy.myfirstlambda.repository.TitleAuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,20 +21,20 @@ public class TestController {
     private TestDao testDao;
 
     @Autowired
-    private TestRepository testRepository;
+    private TitleAuthorRepository titleAuthorRepository;
 
     @Autowired
-    DynamoDBQueryCreator<DynamoDemoEntity> dynamoDBQueryCreator;
+    DynamoDBQueryCreator<TitleAuthorEntity> dynamoDBQueryCreator;
 
     @RequestMapping(value = "/createEntity", method = {RequestMethod.POST})
-    public DynamoDemoEntity createEntity(@RequestBody DemoRequest request) {
-        DynamoDemoEntity entity = new DynamoDemoEntity();
+    public TitleAuthorEntity createEntity(@RequestBody DemoRequest request) {
+        TitleAuthorEntity entity = new TitleAuthorEntity();
         entity.setTitle(request.getTitle());
         entity.setAuthor(request.getAuthor());
         entity.setDescription(request.getDescription());
-        testRepository.save(entity);
+        titleAuthorRepository.save(entity);
 
-        List<DynamoDemoEntity> ret = dynamoDBQueryCreator
+        List<TitleAuthorEntity> ret = dynamoDBQueryCreator
                                         .addCriteria(String.class, "SIMPLE_PROPERTY", "title", Arrays.asList((Object)"test1").iterator())
                                         .and(String.class, "SIMPLE_PROPERTY", "author", Arrays.asList((Object)"test1").iterator())
                                         .complete(null);
@@ -43,30 +43,30 @@ public class TestController {
 
     @RequestMapping(value = "/deleteEntityOnlyHashKey", method = {RequestMethod.POST})
     public void deleteEntityOnlyHashKey(@RequestBody DemoRequest request) {
-        DynamoDemoEntity entity = new DynamoDemoEntity();
+        TitleAuthorEntity entity = new TitleAuthorEntity();
         entity.setTitle(request.getTitle());
         testDao.deleteEntity(entity);
     }
 
     @RequestMapping(value = "/deleteEntityWithRangeKey", method = {RequestMethod.POST})
     public void deleteEntityWithRangeKey(@RequestBody DemoRequest request) {
-        DynamoDemoEntity entity = new DynamoDemoEntity();
+        TitleAuthorEntity entity = new TitleAuthorEntity();
         entity.setTitle(request.getTitle());
         entity.setAuthor(request.getAuthor());
         testDao.deleteEntity(entity);
     }
 
     @RequestMapping(value = "/getEntityOnlyHashKey", method = {RequestMethod.POST})
-    public DynamoDemoEntity getEntityOnlyHashKey(@RequestBody DemoRequest request) {
-        DynamoDemoEntity entity = testDao.getDemoEntity(request.getTitle());
+    public TitleAuthorEntity getEntityOnlyHashKey(@RequestBody DemoRequest request) {
+        TitleAuthorEntity entity = testDao.getDemoEntity(request.getTitle());
         System.out.println(entity.getTitle());
 
         return entity;
     }
 
     @RequestMapping(value = "/getEntityWithRangeKey", method = {RequestMethod.POST})
-    public DynamoDemoEntity getEntityWithRangeKey(@RequestBody DemoRequest request) {
-        DynamoDemoEntity entity = testDao.getDemoEntity(request.getTitle(), request.getAuthor());
+    public TitleAuthorEntity getEntityWithRangeKey(@RequestBody DemoRequest request) {
+        TitleAuthorEntity entity = testDao.getDemoEntity(request.getTitle(), request.getAuthor());
         return entity;
     }
 
